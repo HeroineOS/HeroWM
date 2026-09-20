@@ -23,7 +23,11 @@ impl WaylandDndGrabHandler for State {
         serial: smithay::utils::Serial,
         type_: smithay::input::dnd::GrabType,
     ) {
-        self.fht.dnd_icon = icon;
+        // The DnD icon is drawn at the pointer location, which only makes sense for the primary
+        // seat, since that is the only pointer the compositor draws.
+        if seat == self.fht.seat {
+            self.fht.dnd_icon = icon;
+        }
         match type_ {
             GrabType::Pointer => {
                 let pointer = seat.get_pointer().unwrap();

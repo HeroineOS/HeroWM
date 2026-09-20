@@ -39,7 +39,13 @@ impl SeatHandler for State {
         set_primary_focus(dh, seat, client);
     }
 
-    fn led_state_changed(&mut self, _seat: &Seat<Self>, led_state: LedState) {
+    fn led_state_changed(&mut self, seat: &Seat<Self>, led_state: LedState) {
+        // Only the primary seat is backed by physical keyboards, other seats (transient seats)
+        // must not toggle the LEDs of the user's keyboards.
+        if seat != &self.fht.seat {
+            return;
+        }
+
         let keyboards = self
             .fht
             .devices
@@ -52,7 +58,12 @@ impl SeatHandler for State {
         }
     }
 
-    fn cursor_image(&mut self, _seat: &Seat<Self>, image: CursorImageStatus) {
+    fn cursor_image(&mut self, seat: &Seat<Self>, image: CursorImageStatus) {
+        // The compositor only draws a single cursor, the one of the primary seat.
+        if seat != &self.fht.seat {
+            return;
+        }
+
         self.fht.cursor_theme_manager.set_image_status(image);
     }
 }
