@@ -37,6 +37,7 @@ mod single_pixel_buffer;
 mod transient_seat;
 mod viewporter;
 mod virtual_keyboard;
+mod virtual_pointer;
 mod xdg_activation;
 mod xdg_decoration;
 mod xdg_dialog;

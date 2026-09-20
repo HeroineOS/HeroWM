@@ -85,6 +85,7 @@ use crate::protocols::hyprland_global_shortcuts::HyprlandGlobalShortcutsState;
 use crate::protocols::output_management::{self, OutputManagementManagerState};
 use crate::protocols::screencopy::ScreencopyManagerState;
 use crate::protocols::transient_seat::TransientSeatState;
+use crate::protocols::virtual_pointer::VirtualPointerManagerState;
 use crate::renderer::blur::EffectsFramebuffers;
 use crate::space::{Space, WorkspaceId};
 #[cfg(feature = "xdg-screencast-portal")]
@@ -890,6 +891,12 @@ impl Fht {
         InputMethodManagerState::new::<State, _>(dh, |_| true);
         IdleInhibitManagerState::new::<State>(dh);
         VirtualKeyboardManagerState::new::<State, _>(dh, |_| true);
+        VirtualPointerManagerState::new(dh, |client| {
+            // Only allow clients that aren't running inside a SC
+            client
+                .get_data::<ClientState>()
+                .is_none_or(|data| data.security_context.is_none())
+        });
         PointerConstraintsState::new::<State>(dh);
         TabletManagerState::new::<State>(dh);
         SecurityContextState::new::<State, _>(dh, |client| {
