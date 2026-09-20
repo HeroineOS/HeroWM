@@ -1,5 +1,7 @@
 //! DRM mode handling utilities
 
+use std::ffi::c_char;
+
 use smithay::reexports::drm::control::{ModeFlags, ModeTypeFlags};
 use smithay::reexports::drm::{self};
 
@@ -128,9 +130,10 @@ pub fn get_custom_mode(
 
     let name = {
         let bytes = format!("{width}x{height}@{}", refresh.unwrap_or(60.0)).into_bytes();
-        let mut name = [0i8; 32];
+        // NOTE: c_char is i8 on x86_64 but u8 on aarch64.
+        let mut name = [0 as c_char; 32];
         for (i, &b) in bytes.iter().take(32).enumerate() {
-            name[i] = b as i8;
+            name[i] = b as c_char;
         }
         name
     };
