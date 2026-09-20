@@ -84,6 +84,7 @@ use crate::protocols::ext_workspace::{self, ExtWorkspaceManagerState};
 use crate::protocols::hyprland_global_shortcuts::HyprlandGlobalShortcutsState;
 use crate::protocols::output_management::{self, OutputManagementManagerState};
 use crate::protocols::screencopy::ScreencopyManagerState;
+use crate::protocols::transient_seat::TransientSeatState;
 use crate::renderer::blur::EffectsFramebuffers;
 use crate::space::{Space, WorkspaceId};
 #[cfg(feature = "xdg-screencast-portal")]
@@ -178,6 +179,7 @@ impl State {
         self.update_keyboard_focus();
         // Same reasoning as above.
         self.update_pointer_focus();
+        self.refresh_transient_seats();
 
         {
             crate::profile_scope!("refresh_and_redraw_outputs");
@@ -807,6 +809,7 @@ pub struct Fht {
     pub xdg_foreign_state: XdgForeignState,
     pub ext_workspace_manager_state: ExtWorkspaceManagerState,
     pub hyprland_global_shortcuts_state: HyprlandGlobalShortcutsState,
+    pub transient_seat_state: TransientSeatState,
 }
 
 impl Fht {
@@ -870,6 +873,12 @@ impl Fht {
                 .is_none_or(|data| data.security_context.is_none())
         });
         let hyprland_global_shortcuts_state = HyprlandGlobalShortcutsState::new(dh, |client| {
+            // Only allow clients that aren't running inside a SC
+            client
+                .get_data::<ClientState>()
+                .is_none_or(|data| data.security_context.is_none())
+        });
+        let transient_seat_state = TransientSeatState::new(dh, |client| {
             // Only allow clients that aren't running inside a SC
             client
                 .get_data::<ClientState>()
@@ -1020,6 +1029,7 @@ impl Fht {
             xdg_foreign_state,
             ext_workspace_manager_state,
             hyprland_global_shortcuts_state,
+            transient_seat_state,
         }
     }
 

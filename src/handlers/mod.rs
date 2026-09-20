@@ -34,6 +34,7 @@ mod selection;
 pub mod session_lock;
 mod shm;
 mod single_pixel_buffer;
+mod transient_seat;
 mod viewporter;
 mod virtual_keyboard;
 mod xdg_activation;
