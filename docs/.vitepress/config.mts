@@ -41,6 +41,7 @@ export default defineConfig({
           { text: "XWayland", link: "/usage/xwayland" },
           { text: "Nix modules", link: "/usage/nix" },
           { text: "Portals", link: "/usage/portals" },
+          { text: "Transient seats", link: "/usage/transient-seats" },
           { text: "IPC", link: "/usage/ipc" },
         ],
       },
